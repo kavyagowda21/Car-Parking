@@ -1,3 +1,6 @@
+import argparse
+import sys
+
 class CarParking:
       def __init__(self):
          self.slots=0
@@ -16,8 +19,11 @@ class CarParking:
             return False
       
       def nearby_slot(self):
-        nearest_slot_number = min(self.slots_available)
-        self.slots_available.remove(nearest_slot_number)
+        if self.slots_available==[]:
+          nearest_slot_number=-1  
+        else:
+          nearest_slot_number = min(self.slots_available)
+          self.slots_available.remove(nearest_slot_number)
         return nearest_slot_number
        
       def allocate_slot(self,numberPlate,carColor):
@@ -26,9 +32,7 @@ class CarParking:
           if len(self.slots_taken) < self.slots:
             parking_slot = self.nearby_slot()
             ticket=[parking_slot,numberPlate,carColor]
-            self.slots_taken[numberPlate]=ticket
-         
-          
+            self.slots_taken[numberPlate]=ticket  
           else:
             parking_slot = -1    
           return parking_slot
@@ -36,40 +40,50 @@ class CarParking:
       def deallocate_slot(self,slot_number):
         if len(self.slots_taken) > 0:
           key=-1
-          for key,value in self.slots_taken.items():
-            if slot_number==value[0]:
-              registration_number=key
+          for registration_number,car_info in self.slots_taken.items():
+            if slot_number==car_info[0]:
+              key=registration_number
           if key==-1:
             return False
           else:    
             self.slots_available.append(slot_number)           
-            del self.slots_taken[ registration_number]
-            return value[0]
-          
+            del self.slots_taken[key]
+            return car_info[0]
         else:
                # no such slot
               return False
-          
-          
-          
+      def find_car_with_color(self,colour):
+        all_cars=' '
+        cars=[]
+        for car_info in self.slots_taken.values():
+          cars.append(car_info[2]) 
+        if colour in cars:
+          for car_info in self.slots_taken.values():
+            if colour==car_info[2]:
+              all_cars=all_cars+car_info[1]+'  '
+        else:
+          return False      
+        return all_cars
+      def find_slot_number_for_car_with_color(self,colour):
+        all_cars=' '
+        cars=[]
+        for car_info in self.slots_taken.values():
+          cars.append(car_info[2]) 
+        if colour in cars:
+          for car_info in self.slots_taken.values():
+            if colour==car_info[2]:
+              all_cars=all_cars+'  '+str(car_info[0])
+        else:
+          return False      
+        return all_cars
 
-    
-      
-      
+      def find_slot_number_for_registration_number(self,registration_number):
+        if registration_number in self.slots_taken:
+          slot_value=self.slots_taken[registration_number][0]
+          return slot_value
+        else:
+          return False
       def match_methods(self, inputText):
-        """
-        This method takes query as input and executes the query on the predefined set of commands and matching methods
-        to be executed, and prints the output to the console or writes it to a output file based on the mode selected.
-        Predefined Commands :
-        1. Create_parking_lot <capacity:int>
-        2. Park <vehicle_registration_number:str> driver_age <age:int>
-        3. Leave <parking_slot:int>
-        4. Slot_number_for_car_with_number <vehicle_registration_number:str>
-        5. Slot_numbers_for_driver_of_age <age:int>
-        6. Vehicle_registration_number_for_driver_of_age <age:int>
-        :param query:str Command to be executed with arguments separated by " ".
-        """
-
         if inputText.startswith('create_parking_lot'):
             try:
                 total_slots= int(inputText.split(' ')[1])
@@ -107,6 +121,70 @@ class CarParking:
                     print(f'Slot number {leaving_parking_slot} cannot be vacated.')
             except Exception as exception:
                 print(f'Error in Query - {inputText} : {exception}')
+        elif inputText.startswith('status'):
+            try:
+              print(f'Slot No.\tRegistration No\tColor ')
+              for i in self.slots_taken.values():
+                print(f"\t{i[0]}\t\t{i[1]}\t\t{i[2]}")
+              
+            except Exception as exception:
+                print(f'Error in Query - {inputText} : {exception}')
+        elif inputText.startswith('registration_numbers_for_cars_with_colour'):
+            try:
+              colour=inputText.split(' ')[1]
+              result=self.find_car_with_color(colour)
+              if result:
+                print(result)
+              else:
+                print(f'No cars with color {colour}')
+
+            except Exception as exception:
+                print(f'Error in Query - {inputText} : {exception}')
+        elif inputText.startswith('slot_numbers_for_cars_with_colour'):
+            try:
+              colour=inputText.split(' ')[1]
+              result=self.find_slot_number_for_car_with_color(colour)
+              if result:
+                print(result)
+              else:
+                print(f'No cars with color {colour}')
+
+            except Exception as exception:
+                print(f'Error in Query - {inputText} : {exception}')
+        elif inputText.startswith('slot_number_for_registration_number'):
+            try:
+              registration_number=inputText.split(' ')[1]
+              result=self.find_slot_number_for_registration_number(registration_number)
+              if result:
+                print(result)
+              else:
+                print(f'No cars with Registration Number: {registration_number}')
+
+            except Exception as exception:
+                print(f'Error in Query - {inputText} : {exception}')
+
+if __name__ == '__main__':
+    # Creates an object of Main Class Parking Management
+    parking_management = CarParking()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input_file', action="store", required=True, dest='input_file', help="Input File")
+    parser.add_argument('--output_file', action="store", required=False, dest='output_file', help="Output File")
+
+    args = parser.parse_args()
+
+    # if output_file is argument is specified, all the console output will be written to the output_file.
+    if args.output_file:
+        sys.stdout = open(args.output_file, "w")
+
+    # Iterating through the input_file line by line and passing it to parse_commands method of Parking Management Class.
+    if args.input_file:
+        with open(args.input_file) as input_file:
+            for line in input_file:
+                line = line.rstrip('\n')
+                parking_management.match_methods(line)  
+
+
+
 
 
 
