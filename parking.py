@@ -164,19 +164,16 @@ class CarParking:
                 print(f'Error in Query - {inputText} : {exception}')
 
 if __name__ == '__main__':
-    # Creates an object of Main Class Parking Management
+
     parking_management = CarParking()
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_file', action="store", required=True, dest='input_file', help="Input File")
     parser.add_argument('--output_file', action="store", required=False, dest='output_file', help="Output File")
 
     args = parser.parse_args()
-
-    # if output_file is argument is specified, all the console output will be written to the output_file.
     if args.output_file:
         sys.stdout = open(args.output_file, "w")
 
-    # Iterating through the input_file line by line and passing it to parse_commands method of Parking Management Class.
     if args.input_file:
         with open(args.input_file) as input_file:
             for line in input_file:
