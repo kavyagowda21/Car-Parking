@@ -1,0 +1,12 @@
+create_parking_lot 5
+park ka-10-100 red
+park ka-20-100 red
+leave 2
+park ka-30-100 green
+park ka-40-100 orange
+park ka-50-100 green
+park ka-100-100 orange
+status
+registration_numbers_for_cars_with_colour green
+slot_numbers_for_cars_with_colour green
+slot_number_for_registration_number ka-100-100
