@@ -21,14 +21,14 @@ class TestParkingLot(unittest.TestCase):
         parking_management.create_slots(5)
         parking_management.allocate_slot('KA-10-200','red')
         result=parking_management.find_car_with_color('red')
-        self.assertEqual('KA-10-200',result)
+        self.assertEqual(' KA-10-200  ',result)
 
   def test_find_slot_number_for_car_with_color(self):
         parking_management=CarParking()
         parking_management.create_slots(5)
         parking_management.allocate_slot('KA-10-200','red')
         result=parking_management.find_slot_number_for_car_with_color('red')
-        self.assertEqual(1,result)
+        self.assertEqual('   1',result)
 
   def test_find_slot_number_for_registration_number(self):
         parking_management=CarParking()
